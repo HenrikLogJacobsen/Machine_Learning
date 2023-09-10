@@ -6,12 +6,12 @@ import pandas as pd
 
 class LogisticRegression:
     
-    def __init__():
-        # NOTE: Feel free add any hyperparameters 
-        # (with defaults) as you see fit
-        pass
+    def __init__(self):
         
-    def fit(self, X, y):
+        self.theta0 = 0
+        self.theta = None
+        
+    def fit(self, X, y, iterations=10000, a=.08):
         """
         Estimates parameters for the classifier
         
@@ -21,8 +21,32 @@ class LogisticRegression:
             y (array<m>): a vector of floats containing 
                 m binary 0.0/1.0 labels
         """
-        # TODO: Implement
-        raise NotImplemented()
+        if type(X) is not np.ndarray:
+            x = np.array([X['x0'], X['x1']])
+        else:
+            x = X.T
+            
+        y = np.array(y, dtype='int')
+
+        n = len(x)
+        m = len(x[0])
+
+        # Weights theta
+        theta0 = 0
+        theta = np.zeros(shape=(n,1))
+        
+        for _ in range(iterations):
+
+            z = theta0 + np.dot(theta.T, x)
+            h = sigmoid(z)
+            
+            theta0 += (a/m) * np.sum(y - h)
+            theta += (a/m) * np.dot((y - h), x.T).T
+        
+        self.theta = theta
+        self.theta0 = theta0
+
+
     
     def predict(self, X):
         """
@@ -38,8 +62,15 @@ class LogisticRegression:
             A length m array of floats in the range [0, 1]
             with probability-like predictions
         """
-        # TODO: Implement
-        raise NotImplemented()
+        if type(X) is np.ndarray:
+            x = X
+        else:
+            x = X.to_numpy()
+
+        z = self.theta0 + np.dot(self.theta.T, x.T)
+        h = sigmoid(z)
+        
+        return h[0]
         
 
         
